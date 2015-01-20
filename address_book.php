@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <?php
 
-define('FILE', '../address_book/address_book.csv');
 
-require_once '../address_book/includes/functions_includes.php';
+define('FILE', 'address_book.csv');
 
-$addressData = new addressFunctions(FILE);
+require_once '../classes/AddressDataStore.php';
 
-$addressData->addressBook = $addressData->readCSV();
-	
+$addressData = new AddressDataStore(FILE);
+
+$addressData->addressBook = $addressData->readMe();
+
+
 if(!empty($_POST)){
 	$newEntry = [];
 	
@@ -53,20 +55,16 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == UPLOAD_ERR_OK) {
     // Create the saved filename using the file's original name and our upload directory
     $savedFilename = $uploadDir . $uploadfile;
 
-    $uploadedAddressData = new addressFunctions($savedFilename);
-
+    $uploadedAddressData = new AddressDataStore($savedFilename);
     if(substr($uploadfile, -3) == 'csv'){
 	    // Move the file from the temp location to our uploads directory
 	    move_uploaded_file($_FILES['file1']['tmp_name'], $savedFilename);
-	    $addressData->addressBook = array_merge($addressData->addressBook, $uploadedAddressData->readCSV());
+	    $addressData->addressBook = array_merge($addressData->addressBook, $uploadedAddressData->readMe());
 	    $addressData->saveFile($addressData->addressBook);
 	}else{
 		echo "There was an error in processing your file, please use 'csv' file type.";
 	}
 }
-		    
-
-
 
 ?>
 <html>
@@ -79,6 +77,7 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == UPLOAD_ERR_OK) {
     <link rel="javascript" type="text/css" href="../bootstrap/js/bootstrap.min.js">
     <link href="../font-awesome-4.2.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
+<body>
 <table>
 	<tr>
 		<th>Location</th>
@@ -153,12 +152,6 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == UPLOAD_ERR_OK) {
             <input type="submit" value="Upload">
         </p>
     </form>
-
-
-
-
-<body>
-
 
 </body>
 </html>
